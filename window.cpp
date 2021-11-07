@@ -42,11 +42,15 @@ Window::Window(int width, int height, const char* title)
 	std::cout << "Render: " << renderer << std::endl;
 	std::cout << "Version support opengl: " << version << std::endl;
 
-	glClearColor(0.5f, 0.5f, 1, 0);
+	glClearColor(0, 0, 0, 0);
 }
 
 void Window::update()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glfwPollEvents();
+	glfwSwapBuffers(pWindow);
 
 }
 
