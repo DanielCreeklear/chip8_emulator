@@ -1,4 +1,4 @@
-# GLFW binaries for 64-bit Windows
+# GLFW binaries for 32-bit Windows
 
 This archive contains documentation, headers, pre-compiled static libraries,
 import libraries and DLLs for GLFW 3.3.5.
@@ -11,7 +11,9 @@ Binaries for the following compilers are included
  - Visual C++ 2015 (built with 14.0.25431.01)
  - Visual C++ 2013 (built with 12.0.40629.00)
  - Visual C++ 2012 (built with 11.0.61219.00)
+ - Visual C++ 2010 (built with 10.0.30319.1)
  - MinGW-w64 (built with GCC 8.1.0)
+ - MinGW (built with GCC 9.2.0)
 
 
 ## Binaries for Visual C++
@@ -43,7 +45,7 @@ information but can still be linked with the debug versions of the runtime
 library.
 
 
-## Binaries for MinGW-w64
+## Binaries for MinGW and MinGW-w64
 
 ### GLFW as a DLL
 
