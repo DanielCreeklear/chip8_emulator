@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     cpu.initialize();
     cpu.loadGame(fileGame);
 
-    for (;;)
+    while (!window.shouldClose())
     {
         cpu.emulateCycle();
 

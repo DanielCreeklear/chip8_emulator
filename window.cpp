@@ -2,6 +2,8 @@
 
 Window::Window(int width, int height, const char* title)
 {
+	shouldTerminate = true;
+
 	if (!glfwInit())
 	{
 		std::cerr << "Error starting GLFW!" << std::endl;
@@ -43,6 +45,8 @@ Window::Window(int width, int height, const char* title)
 	std::cout << "Version support opengl: " << version << std::endl;
 
 	glClearColor(0, 0, 0, 0);
+
+	shouldTerminate = false;
 }
 
 void Window::update()
@@ -52,6 +56,7 @@ void Window::update()
 	glfwPollEvents();
 	glfwSwapBuffers(pWindow);
 
+	if (!shouldTerminate) shouldTerminate = glfwWindowShouldClose(pWindow);
 }
 
 Window::~Window()
