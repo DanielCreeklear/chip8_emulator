@@ -108,7 +108,9 @@ void Cpu::emulateCycle()
 bool Cpu::loadGame(char* gameName)
 {
     cout << "Loading: [" << gameName << "]. " << endl;
-    FILE* fileGame = fopen(gameName, "rb");
+    FILE* fileGame;
+    fopen_s(&fileGame, gameName, "rb");
+
 	if (fileGame == NULL)
 	{
 		fputs ("File error", stderr); 
