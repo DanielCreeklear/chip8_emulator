@@ -1,0 +1,15 @@
+# VSC
+*.code-workspace
+
+# Visual Studio 2019
+*.sln
+*.vcxproj
+*.user
+*.filters
+.vs
+
+# All executables
+*.exe
+
+# Zips from dependencies
+*.zip
