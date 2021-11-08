@@ -1,8 +1,9 @@
 #include "window.h"
 
+
 Window::Window(int width, int height, const char* title)
 {
-	shouldTerminate = true;
+	needClose = true;
 
 	if (!glfwInit())
 	{
@@ -18,15 +19,15 @@ Window::Window(int width, int height, const char* title)
 	glfwSetErrorCallback(Window::errorCallback);
 
 	// Creating Window
-	pWindow = glfwCreateWindow(width, height, title, NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, title, NULL, NULL);
 
-	if (!pWindow)
+	if (!mainWindow)
 	{
 		std::cerr << "Error building window" << std::endl;
 		return;
 	}
 
-	glfwMakeContextCurrent(pWindow);
+	glfwMakeContextCurrent(mainWindow);
 
 	// Initializing GLEW
 	GLenum glewInitStatus = glewInit();
@@ -46,7 +47,7 @@ Window::Window(int width, int height, const char* title)
 
 	glClearColor(0, 0, 0, 0);
 
-	shouldTerminate = false;
+	needClose = false;
 }
 
 void Window::update()
@@ -54,9 +55,12 @@ void Window::update()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glfwPollEvents();
-	glfwSwapBuffers(pWindow);
 
-	if (!shouldTerminate) shouldTerminate = glfwWindowShouldClose(pWindow);
+	if (currentScene) currentScene->update();
+
+	glfwSwapBuffers(mainWindow);
+
+	if (!needClose) needClose = (glfwWindowShouldClose(mainWindow) == GL_TRUE);
 }
 
 Window::~Window()

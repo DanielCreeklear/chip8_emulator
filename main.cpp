@@ -1,6 +1,8 @@
 #include <iostream>
 #include "cpu.h"
 #include "window.h"
+#include "myscene.h"
+#include <memory>
 
 using namespace std;
 
@@ -12,6 +14,8 @@ int main(int argc, char **argv)
 {
     //setupGraphics();
     //setupInput();
+    window.setScene(unique_ptr<Scene>(new MyScene()));
+
 
     cpu.initialize();
     cpu.loadGame(fileGame);
