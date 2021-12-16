@@ -1,3 +1,4 @@
+#pragma once
 // Hardware constants
 const int MAX_ADDRESS_MEMORY = 0x1000;
 const int MAX_REGISTERS = 16;

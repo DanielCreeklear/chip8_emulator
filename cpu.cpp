@@ -28,23 +28,25 @@ void Cpu::emulateCycle()
         case 0x0000:
             switch (opcode & 0x000F)
             {
-            case 0x0000:
+                case 0x0000:
+                    //
                 break;
 
-            case 0x000E:
+                case 0x000E:
+                    //
                 break;
             
-            default:
-                cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                default:
+                    cout << "Unknown opcode: 0x" << hex << opcode << endl;
                 break;
             }
-            break;
+        break;
 
         case 0x2000:
             stack[sp] = pc;
             ++sp;
             pc = opcode & 0x0FFF;
-            break;
+        break;
 
         case 0x8000:
             switch (opcode & 0x000F)
@@ -59,41 +61,42 @@ void Cpu::emulateCycle()
                         V[0xF] = 0;
                     }
                     V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
-                    break;
+                break;
                 
                 default:
                     cout << "Unknown opcode: 0x" << hex << opcode << endl;
-                    break;
+                break;
             }
-            break;
+        break;
 
         case 0xA000:
             I = opcode & 0x0FFF;
             pc += 2;
-            break;
+        break;
 
         case 0xF000:
             switch (opcode & 0x00FF)
             {
                 case 0x0033:
-                memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
-                memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
-                memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
-                pc += 2;
+                    memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
+                    memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
+                    memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
+                    pc += 2;
                 break;
             
                 default:
                     cout << "Unknown opcode: 0x" << hex << opcode << endl;
-                    break;
+                break;
             }
-            break;
+        break;
 
         default:
             cout << "Unknown opcode: 0x" << hex << opcode << endl;
-            break;
+        break;
     }
 
     if (delay_timer > 0) --delay_timer;
+
     if (sound_timer > 0)
     {
         if (sound_timer == 1)
