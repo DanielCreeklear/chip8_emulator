@@ -58,7 +58,7 @@ void Cpu::emulateCycle()
             
                 default:
                     cout << "Unknown opcode: 0x" << hex << opcode << endl;
-                    //exit(3);
+                    
                 break;
             }
         break;
@@ -162,7 +162,7 @@ void Cpu::emulateCycle()
                 
                 default:
                     cout << "Unknown opcode: 0x" << hex << opcode << endl;
-                    //exit(3);
+                    
                 break;
             }
         break;
@@ -215,7 +215,7 @@ void Cpu::emulateCycle()
 
                 default:
                     cout << "Unknown opcode: 0x" << hex << opcode << endl;
-                    //exit(3);
+                    
                 break;
             }
         break;
@@ -272,14 +272,14 @@ void Cpu::emulateCycle()
             
                 default:
                     cout << "Unknown opcode: 0x" << hex << opcode << endl;
-                    //exit(3);
+                    
                 break;
             }
         break;
 
         default:
             cout << "Unknown opcode: 0x" << hex << opcode << endl;
-            //exit(3);
+            
         break;
     }
 
