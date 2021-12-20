@@ -6,6 +6,8 @@ using namespace std;
 
 void update_display();
 void idle();
+void keyUp(unsigned char key, int x, int y);
+void keyDown(unsigned char key, int x, int y);
 
 Cpu cpu;
 uint8_t*** pixelBuffer = NULL;
@@ -35,6 +37,8 @@ int main(int argc, char **argv)
 	glutInitWindowPosition(320, 320);
 	glutCreateWindow(title);
 
+	glutKeyboardFunc(keyDown);
+	glutKeyboardUpFunc(keyUp);
 	glutDisplayFunc(update_display);
 	glutIdleFunc(idle);
 	gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
@@ -52,7 +56,7 @@ void update_display()
 	{
 		for (int x = 0; x < 64; ++x)
 		{
-			if (y % 2 == 0 && x % 2 == 0)
+			if (cpu.gfx[x + y * 64] == 1)
 			{
 				glColor3f(1, 1, 1);
 			}
@@ -81,4 +85,42 @@ void idle()
 		glutPostRedisplay();
 		cpu.drawFlag = false;
 	}
+}
+
+void keyDown(unsigned char key, int x, int y) {
+	if (key == '1') cpu.key[1] = 1;
+	if (key == '2') cpu.key[2] = 1;
+	if (key == '3') cpu.key[3] = 1;
+	if (key == 'q') cpu.key[4] = 1;
+	if (key == 'w') cpu.key[5] = 1;
+	if (key == 'e') cpu.key[6] = 1;
+	if (key == 'a') cpu.key[7] = 1;
+	if (key == 's') cpu.key[8] = 1;
+	if (key == 'd') cpu.key[9] = 1;
+	if (key == 'z') cpu.key[10] = 1;
+	if (key == 'c') cpu.key[11] = 1;
+	if (key == 'v') cpu.key[12] = 1;
+	if (key == 'f') cpu.key[13] = 1;
+	if (key == 'r') cpu.key[14] = 1;
+	if (key == '4') cpu.key[15] = 1;
+	if (key == 'x') cpu.key[0] = 1;
+}
+
+void keyUp(unsigned char key, int x, int y) {
+	if (key == '1') cpu.key[1] = 0;
+	if (key == '2') cpu.key[2] = 0;
+	if (key == '3') cpu.key[3] = 0;
+	if (key == 'q') cpu.key[4] = 0;
+	if (key == 'w') cpu.key[5] = 0;
+	if (key == 'e') cpu.key[6] = 0;
+	if (key == 'a') cpu.key[7] = 0;
+	if (key == 's') cpu.key[8] = 0;
+	if (key == 'd') cpu.key[9] = 0;
+	if (key == 'z') cpu.key[10] = 0;
+	if (key == 'c') cpu.key[11] = 0;
+	if (key == 'v') cpu.key[12] = 0;
+	if (key == 'f') cpu.key[13] = 0;
+	if (key == 'r') cpu.key[14] = 0;
+	if (key == '4') cpu.key[15] = 0;
+	if (key == 'x') cpu.key[0] = 0;
 }

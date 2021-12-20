@@ -1,5 +1,7 @@
 #pragma once
-// Hardware constants
+#include <random>
+#include "utils.h"
+
 const int MAX_ADDRESS_MEMORY = 0x1000;
 const int MAX_REGISTERS = 16;
 const int WIDTH = 64;
@@ -13,14 +15,14 @@ class Cpu
         unsigned char V[MAX_REGISTERS];
         unsigned short I;
         unsigned short pc;
-
-        unsigned char gfx[WIDTH * HEIGHT];
-        unsigned key[0x10];
+        
         unsigned char delay_timer;
         unsigned char sound_timer;
 
         unsigned short stack[0x10];
         unsigned short sp;
+
+        bool jumpFlag, skipFlag;
 
         unsigned char chip8_fontset[80] =
         { 
@@ -45,6 +47,8 @@ class Cpu
         Cpu();
 
         bool drawFlag;
+        unsigned char gfx[WIDTH * HEIGHT];
+        unsigned key[0x10];
 
         void initialize();
         void emulateCycle();

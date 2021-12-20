@@ -5,7 +5,6 @@ bool loadFile(const char* fileName, std::stringstream& result)
 	try
 	{
 		std::ifstream file;
-
 		file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		file.open(fileName);
 		result << file.rdbuf();
