@@ -1,6 +1,8 @@
 #pragma once
 #include <random>
+#include <chrono>
 #include "utils.h"
+#include "clock.h"
 
 const int MAX_ADDRESS_MEMORY = 0x1000;
 const int MAX_REGISTERS = 16;
@@ -43,6 +45,9 @@ class Cpu
         0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
         };
+        Clock clock;
+
+        void timerCycle();
     public:
         Cpu();
 
@@ -50,7 +55,7 @@ class Cpu
         unsigned char gfx[WIDTH * HEIGHT];
         unsigned key[0x10];
 
-        void initialize();
+        void initialize(const float mhz);
         void emulateCycle();
         bool loadGame(char*);
         void setKeys();

@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 			pixelBuffer[i][j] = new uint8_t[3];
 		}
 	}
-	cpu.initialize();
+	cpu.initialize(2.0f);
 	cpu.loadGame(fileGame);
 
 	glutInit(&argc, argv);
