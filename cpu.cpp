@@ -37,11 +37,13 @@ void Cpu::emulateCycle()
     unsigned short height;
     unsigned short pixelRow;
     bool keyPressed;
+
     jumpFlag = false;
     skipFlag = false;
     opcode = memory[pc] << 8 | memory[pc + 1];
+    int X = ((opcode & 0x0F00) >> 8), Y = ((opcode & 0x00F0) >> 4);
 
-    cout << "opcode: 0x" << hex << opcode << endl;
+    //cout << "opcode: 0x" << hex << opcode << endl;
     switch (opcode & 0xF000)
     {
         case 0x0000:
@@ -76,45 +78,45 @@ void Cpu::emulateCycle()
         break;
 
         case 0x3000:
-            if (V[((opcode & 0x0F00) >> 8)] == (opcode & 0x00FF)) skipFlag = true;
+            if (V[X] == (opcode & 0x00FF)) skipFlag = true;
         break;
 
         case 0x4000:
-            if ((V[((opcode & 0x0F00) >> 8)]) != (opcode & 0x00FF)) skipFlag = true;
+            if ((V[X]) != (opcode & 0x00FF)) skipFlag = true;
         break;
 
         case 0x5000:
-            if ((V[((opcode & 0x0F00) >> 8)]) == (V[((opcode & 0x00F0) >> 4)])) skipFlag = true;
+            if ((V[X]) == V[Y]) skipFlag = true;
 
         case 0x6000:
-            V[((opcode & 0x0F00) >> 8)] = opcode & 0x00FF;
+            V[X] = opcode & 0x00FF;
         break;
 
         case 0x7000:
-            V[((opcode & 0x0F00) >> 8)] += opcode & 0x00FF;
+            V[X] += opcode & 0x00FF;
         break;
 
         case 0x8000:
             switch (opcode & 0x000F)
             {
                 case 0x0000:
-                    V[((opcode & 0x0F00) >> 8)] = (V[((opcode & 0x0F00) >> 8)]);
+                    V[X] = V[Y];
                 break;
 
                 case 0x0001:
-                    V[((opcode & 0x0F00) >> 8)] |= (V[((opcode & 0x00F0) >> 4)]);
+                    V[X] |= V[Y];
                 break;
 
                 case 0x0002:
-                    V[((opcode & 0x0F00) >> 8)] &= (V[((opcode & 0x00F0) >> 4)]);
+                    V[X] &= V[Y];
                 break;
 
                 case 0x0003:
-                    V[((opcode & 0x0F00) >> 8)] ^= (V[((opcode & 0x00F0) >> 4)]);
+                    V[X] ^= V[Y];
                 break;
 
                 case 0x0004:
-                    if (V[((opcode & 0x00F0) >> 4)] > 0xFF - V[((opcode & 0x0F00) >> 8)])
+                    if (V[Y] > 0xFF - V[X])
                     {
                         V[0xF] = 1;
                     }
@@ -122,11 +124,11 @@ void Cpu::emulateCycle()
                     {
                         V[0xF] = 0;
                     }
-                    V[((opcode & 0x0F00) >> 8)] += V[((opcode & 0x00F0) >> 4)];
+                    V[X] += V[Y];
                 break;
 
                 case 0x0005:
-                    if (V[((opcode & 0x00F0) >> 4)] > V[((opcode & 0x0F00) >> 8)])
+                    if (V[Y] > V[X])
                     {
                         V[0xF] = 0;
                     }
@@ -134,17 +136,17 @@ void Cpu::emulateCycle()
                     {
                         V[0xF] = 1;
                     }
-                    V[((opcode & 0x0F00) >> 8)] -= V[((opcode & 0x00F0) >> 4)];
+                    V[X] -= V[Y];
                 break;
 
 
                 case 0x0006:
-                    V[0xF] = V[((opcode & 0x0F00) >> 8)] & 1;
-                    V[((opcode & 0x0F00) >> 8)] >>= 1;
+                    V[0xF] = V[X] & 1;
+                    V[X] >>= 1;
                 break;
 
                 case 0x0007:
-                    if (V[((opcode & 0x0F00) >> 8)] > V[((opcode & 0x00F0) >> 4)])
+                    if (V[X] > V[Y])
                     {
                         V[0xF] = 0;
                     }
@@ -152,12 +154,12 @@ void Cpu::emulateCycle()
                     {
                         V[0xF] = 1;
                     }
-                    V[((opcode & 0x00F0) >> 4)] -= V[((opcode & 0x0F00) >> 8)];
+                    V[Y] -= V[X];
                 break;
 
                 case 0x000E:
-                    V[0xF] = V[((opcode & 0x0F00) >> 8)] >> 7;
-                    V[((opcode & 0x0F00) >> 8)] <<= 1;
+                    V[0xF] = V[X] >> 7;
+                    V[X] <<= 1;
                 break;
                 
                 default:
@@ -168,7 +170,7 @@ void Cpu::emulateCycle()
         break;
 
         case 0x9000:
-            if ((V[((opcode & 0x0F00) >> 8)]) != (V[((opcode & 0x00F0) >> 4)])) skipFlag = true;
+            if ((V[X]) != V[Y]) skipFlag = true;
         break;
 
         case 0xA000:
@@ -181,13 +183,13 @@ void Cpu::emulateCycle()
         break;
 
         case 0xC000:
-            V[((opcode & 0x0F00) >> 8)] = (rand() % (0xFF + 1)) & (opcode & 0x00FF);
+            V[X] = (rand() % (0xFF + 1)) & (opcode & 0x00FF);
         break;
 
         case 0xD000:
             drawFlag = true;
-            pixelX = V[((opcode & 0x0F00) >> 8)];
-            pixelY = V[((opcode & 0x00F0) >> 4)];
+            pixelX = V[X];
+            pixelY = V[Y];
             height = opcode & 0x000F;
             V[0xF] = 0;
 
@@ -206,11 +208,11 @@ void Cpu::emulateCycle()
             switch (opcode & 0x00FF)
             {
                 case 0x009E:
-                    if (key[V[((opcode & 0x0F00) >> 8)]] == 1) skipFlag = true;
+                    if (key[V[X]] == 1) skipFlag = true;
                 break;
 
                 case 0x00A1:
-                    if (key[V[((opcode & 0x0F00) >> 8)]] == 0) skipFlag = true;
+                    if (key[V[X]] == 0) skipFlag = true;
                 break;
 
                 default:
@@ -224,7 +226,7 @@ void Cpu::emulateCycle()
             switch (opcode & 0x00FF)
             {
                 case 0x0007:
-                    V[((opcode & 0x0F00) >> 8)] = delay_timer;
+                    V[X] = delay_timer;
                 break;
 
                 case 0x000A:
@@ -234,40 +236,40 @@ void Cpu::emulateCycle()
                         if (key[i])
                         {
                             keyPressed = true;
-                            V[((opcode & 0x0F00) >> 8)] = i;
+                            V[X] = i;
                         }
                     }
                     if (!keyPressed) return;
                 break;
 
                 case 0x0015:
-                    delay_timer = V[((opcode & 0x0F00) >> 8)];
+                    delay_timer = V[X];
                 break;
 
                 case 0x0018:
-                    sound_timer = V[((opcode & 0x0F00) >> 8)];
+                    sound_timer = V[X];
                 break;
 
                 case 0x001E:
-                    I += V[((opcode & 0x0F00) >> 8)];
+                    I += V[X];
                 break;
 
                 case 0x0029:
-                    I = V[((opcode & 0x0F00) >> 8)] * 0x5;
+                    I = V[X] * 0x5;
                 break;
 
                 case 0x0033:
-                    memory[I] = V[((opcode & 0x0F00) >> 8)] / 100;
-                    memory[I + 1] = (V[((opcode & 0x0F00) >> 8)] / 10) % 10;
-                    memory[I + 2] = (V[((opcode & 0x0F00) >> 8)] % 100) % 10;
+                    memory[I] = V[X] / 100;
+                    memory[I + 1] = (V[X] / 10) % 10;
+                    memory[I + 2] = (V[X] % 100) % 10;
                 break;
 
                 case 0x0055:
-                    for (int i = 0; i <= V[((opcode & 0x0F00) >> 8)]; i++) memory[I + i] = V[i];
+                    for (int i = 0; i <= V[X]; i++) memory[I + i] = V[i];
                 break;
 
                 case 0x0065:
-                    for (int i = 0; i <= V[((opcode & 0x0F00) >> 8)]; i++) V[i] = memory[I + i];
+                    for (int i = 0; i <= V[X]; i++) V[i] = memory[I + i];
                 break;
             
                 default:
