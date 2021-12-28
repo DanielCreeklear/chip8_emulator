@@ -45,7 +45,8 @@ void Cpu::emulateCycle()
         jumpFlag = false;
         skipFlag = false;
         opcode = memory[pc] << 8 | memory[pc + 1];
-        int X = ((opcode & 0x0F00) >> 8), Y = ((opcode & 0x00F0) >> 4);
+        unsigned short X = ((opcode & 0x0F00) >> 8);
+        unsigned short Y = ((opcode & 0x00F0) >> 4);
 
         cout << "opcode: 0x" << hex << opcode << endl;
         switch (opcode & 0xF000)
@@ -202,9 +203,13 @@ void Cpu::emulateCycle()
                     pixelRow = memory[I + y];
                     for (int x = 0; x < 8; x++)
                     {
-                        gfx[pixelX + x + ((pixelY + y) * 64)] ^= 1;
+                        if (((pixelRow >> 7) & 1) != 0)
+                        {
+                            if (gfx[pixelX + x + ((pixelY + y) * 64)] == 1) V[0xF] = 1;
+                            gfx[pixelX + x + ((pixelY + y) * 64)] ^= 1;
+                        }
+                        pixelRow <<= 1;
                     }
-                    pixelRow <<= 1;
                 }
             break;
 
