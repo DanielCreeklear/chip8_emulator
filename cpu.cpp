@@ -48,7 +48,7 @@ void Cpu::emulateCycle()
         unsigned short X = ((opcode & 0x0F00) >> 8);
         unsigned short Y = ((opcode & 0x00F0) >> 4);
 
-        cout << "opcode: 0x" << hex << opcode << endl;
+        //cout << "opcode: 0x" << hex << opcode << endl;
         switch (opcode & 0xF000)
         {
             case 0x0000:
@@ -64,7 +64,7 @@ void Cpu::emulateCycle()
                     break;
             
                     default:
-                        cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                        //cout << "Unknown opcode: 0x" << hex << opcode << endl;
                     
                     break;
                 }
@@ -168,7 +168,7 @@ void Cpu::emulateCycle()
                     break;
                 
                     default:
-                        cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                        //cout << "Unknown opcode: 0x" << hex << opcode << endl;
                     
                     break;
                 }
@@ -225,7 +225,7 @@ void Cpu::emulateCycle()
                     break;
 
                     default:
-                        cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                        //cout << "Unknown opcode: 0x" << hex << opcode << endl;
                     
                     break;
                 }
@@ -282,14 +282,14 @@ void Cpu::emulateCycle()
                     break;
             
                     default:
-                        cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                        //cout << "Unknown opcode: 0x" << hex << opcode << endl;
                     
                     break;
                 }
             break;
 
             default:
-                cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                //cout << "Unknown opcode: 0x" << hex << opcode << endl;
             
             break;
         }
@@ -309,12 +309,12 @@ void Cpu::emulateCycle()
 
 bool Cpu::loadGame(char* gameName)
 {
-    cout << "Loading: [" << gameName << "]. " << endl;
+    //cout << "Loading: [" << gameName << "]. " << endl;
     stringstream fileGame;
     if (!loadFile(gameName, fileGame)) return false;
 
     string fileData = fileGame.str();
-    cout << "File size: " << fileData.length() << " bytes." << endl;
+    //cout << "File size: " << fileData.length() << " bytes." << endl;
 
     if (0x1000 - 0x200 > fileData.length())
     {
@@ -322,11 +322,11 @@ bool Cpu::loadGame(char* gameName)
     }
     else
     {
-        cout << "Error! ROM is bigger than available memory." << endl;
+        //cout << "Error! ROM is bigger than available memory." << endl;
         return false;
     }
 
-    cout << "Successfuly loaded!" << endl;
+    //cout << "Successfuly loaded!" << endl;
     return true;
 }
 
