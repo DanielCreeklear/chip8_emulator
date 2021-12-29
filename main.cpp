@@ -1,6 +1,7 @@
 #include <iostream>
 #include <gl/glut.h>
 #include "cpu.h"
+#include "chrono"
 
 using namespace std;
 
@@ -15,6 +16,8 @@ static int WINDOW_WIDTH = 640, WINDOW_HEIGHT = 320;
 const int pixelSize = 10;
 char fileGame[] = "invaders.c8"; 
 char title[] = "CHIP 8 - Emulator";
+
+int fps = 0;
 
 int main(int argc, char **argv)
 {
@@ -85,6 +88,7 @@ void idle()
 		glutPostRedisplay();
 		cpu.drawFlag = false;
 	}
+	if (fps == 30) fps = 0;
 }
 
 void keyDown(unsigned char key, int x, int y) {
