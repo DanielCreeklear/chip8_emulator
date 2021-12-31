@@ -1,7 +1,7 @@
 #include <iostream>
+#include <time.h>
 #include <gl/glut.h>
 #include "cpu.h"
-#include "chrono"
 
 using namespace std;
 
@@ -17,6 +17,7 @@ const int pixelSize = 10;
 char title[] = "CHIP 8 - Emulator";
 
 int fps = 0;
+clock_t startTimer;
 
 int main(int argc, char **argv)
 {
@@ -46,6 +47,7 @@ int main(int argc, char **argv)
 	gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
 	glClearColor(0, 0, 0, 0);
 
+	startTimer = clock();
 	glutMainLoop();
     return 0;
 }
@@ -82,12 +84,21 @@ void update_display()
 void idle()
 {
 	cpu.emulateCycle();
+
 	if (cpu.drawFlag)
 	{
+		fps++;
 		glutPostRedisplay();
 		cpu.drawFlag = false;
+		
+		if (((float) (clock() - startTimer)) / CLOCKS_PER_SEC >= 1)
+		{
+			string newTitle = title + (string)" - " + to_string(fps) + (string)" FPS";
+			glutSetWindowTitle(newTitle.c_str());
+			fps = 0;
+			startTimer = clock();
+		}
 	}
-	if (fps == 30) fps = 0;
 }
 
 void keyDown(unsigned char key, int x, int y) {
