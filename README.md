@@ -19,3 +19,7 @@ the language can help to speed up future development, where i'll just need to re
 
 # Getting Started
 
+## Running
+```
+chip8 [Path to file with code]
+```
