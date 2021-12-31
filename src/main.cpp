@@ -14,7 +14,6 @@ Cpu cpu;
 uint8_t*** pixelBuffer = NULL;
 static int WINDOW_WIDTH = 640, WINDOW_HEIGHT = 320;
 const int pixelSize = 10;
-char fileGame[] = "invaders.c8"; 
 char title[] = "CHIP 8 - Emulator";
 
 int fps = 0;
@@ -31,7 +30,7 @@ int main(int argc, char **argv)
 		}
 	}
 	cpu.initialize(2.0f);
-	cpu.loadGame(fileGame);
+	cpu.loadGame(argv[1]);
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
