@@ -309,7 +309,7 @@ void Cpu::emulateCycle()
 
 bool Cpu::loadGame(char* gameName)
 {
-    //cout << "Loading: [" << gameName << "]. " << endl;
+    cout << "Loading: " << gameName << "\n";
     stringstream fileGame;
     if (!loadFile(gameName, fileGame)) return false;
 
@@ -326,7 +326,7 @@ bool Cpu::loadGame(char* gameName)
         return false;
     }
 
-    //cout << "Successfuly loaded!" << endl;
+    cout << "Successfuly loaded!" << "\n";
     return true;
 }
 
