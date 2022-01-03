@@ -76,8 +76,7 @@ void Cpu::emulateCycle()
             break;
 
             case 0x2000:
-                stack[sp] = pc;
-                ++sp;
+                stack[sp++] = pc;
                 pc = opcode & 0x0FFF;
                 jumpFlag = true;
             break;
@@ -314,7 +313,7 @@ bool Cpu::loadGame(char* gameName)
     if (!loadFile(gameName, fileGame)) return false;
 
     string fileData = fileGame.str();
-    //cout << "File size: " << fileData.length() << " bytes." << endl;
+    cout << "File size: " << fileData.length() << " bytes." << endl;
 
     if (0x1000 - 0x200 > fileData.length())
     {
@@ -322,7 +321,7 @@ bool Cpu::loadGame(char* gameName)
     }
     else
     {
-        //cout << "Error! ROM is bigger than available memory." << endl;
+        cout << "Error! ROM is bigger than available memory." << endl;
         return false;
     }
 
