@@ -1,0 +1,1080 @@
+;; Lunar lander clone for the CHIP-8
+;;
+;; Coded by Jeffrey Massung as an example of the
+;; CHIP-8 assembler.
+;;
+;; Have fun!
+;;
+
+;; Where is the lander?
+;;
+x               var         v4
+y               var         v5
+
+;; Current thrust vector (y) and tilt (x). These are #80
+;; when not moving. When they drop to #40 then the lander
+;; X/Y will decrease by 1. When they reach #C0 then the
+;; lander X/Y will increase by 1. Then the the thrust/tilt
+;; will reset back to #80.
+;;
+thrust          var         v6
+tilt            var         v7
+
+;; Thrust vectors (X and Y). Each loop iteration these will
+;; be applied to the thrust/tilt of the lander.
+;;
+vx              var         v8     ; affects tilt
+vy              var         v9     ; affects thrust
+
+;; How much fuel is in use and is left.
+;;
+fuel_use        var         va
+fuel            var         vb
+
+;; Where is the target platform along the ground.
+;;
+plat_x          var         vc
+
+;; Key mapping.
+;;
+up              equ         5     ; w
+left            equ         7     ; a
+right           equ         9     ; d
+
+;; Rate at which gravity is applied.
+;;
+g               equ         10
+
+;; Whether or not thrust is visible is stored in R0. This
+;; is toggled every time the thrust is drawn so it can be
+;; checked and the thrust can be hidden if desired.
+
+
+                super
+                extended
+
+;; Initial setup for the game.
+;;
+start           high
+
+
+;; Initial setup for every level.
+;;
+init            cls
+
+                ; Show the current level and score.
+                call        next_level
+                call        draw_score
+
+                ; Wait for a key press or a few seconds.
+                ld          v0, k
+                cls
+
+                ; Initialize all major pieces.
+                call        init_border
+                call        init_ground
+                call        init_platform
+                call        smooth_terrain
+                call        init_lander
+                call        fill_tank
+
+                ; Main game loop.
+loop            call        input
+                call        move
+                call        gravity
+
+                ; Has the lander landed successfully?
+                ld          i, landed
+                ld          v0, [i]
+                se          v0, 0
+                jp          init
+
+                ; Do it all over again...
+                jp          loop
+
+
+;; Advance the level, display it, clear variables.
+;;
+next_level      ld          i, level
+                ld          v0, [i]
+
+                ; Write the new level # and clear the landed flag.
+                add         v0, 1
+                ld          v1, 0
+                ld          [i], v1
+
+                ; Display the level and # in the top left.
+                ld          i, level_text
+                ld          v1, 39
+                ld          v2, 26
+                ld          v3, 5
+
+                ; Display LEVEL.
+                drw         v1, v2, 5  ; L
+                add         v1, 4
+                add         i, v3
+                drw         v1, v2, 5  ; E
+                add         v1, 4
+                add         i, v3
+                drw         v1, v2, 5  ; V
+                add         v1, 4
+                add         i, v3
+                drw         v1, v2, 5  ; E
+                add         v1, 4
+                add         i, v3
+                drw         v1, v2, 5  ; L
+
+                ; Convert the level # to BCD.
+                ld          i, scratch
+                bcd         v0
+                ld          v2, [i]
+
+                ; Display the level number.
+                ld          f, v1
+                ld          v0, 66
+                ld          v3, 26
+                drw         v0, v3, 5
+                ld          f, v2
+                add         v0, 5
+                drw         v0, v3, 5
+                ret
+
+
+;; Display the score.
+;;
+draw_score      ld          i, score_text
+                ld          v0, 39
+                ld          v1, 33
+                ld          v2, 5
+
+                ; Display SCORE.
+                drw         v0, v1, 5  ; S
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5  ; C
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5  ; O
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5  ; R
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5  ; E
+
+                ; Load the score.
+                ld          i, score
+                ld          v1, [i]
+
+                ; Perform a 16-bit BCD conversion.
+                ld          i, scratch
+                bcd         v1, v0
+                ld          v4, [i]
+
+                ; Display the number.
+                ld          f, v1
+                ld          v0, 66
+                ld          v1, 33
+                drw         v0, v1, 5
+                ld          f, v2
+                add         v0, 5
+                drw         v0, v1, 5
+                ld          f, v3
+                add         v0, 5
+                drw         v0, v1, 5
+                ld          f, v4
+                add         v0, 5
+                drw         v0, v1, 5
+
+                ; Done
+                ret
+
+
+;; Initialize the lander, pick a random position
+;;
+init_lander     rnd         x, #3f
+                add         x, #20
+                ld          y, 0
+
+                ; Reset the thrust flag.
+                ld          v0, 0
+                ld          r, v0
+
+                ; Start with an initial falling velocity.
+                ld          vy, 8
+
+                ; Pick a random, lateral velocity.
+                rnd         vx, #1f
+                add         vx, -15
+
+                ; Reset the thrust/tilt vectors.
+                ld          thrust, #80
+                ld          tilt, #80
+
+                ; When fuel_use rolls over, fuel is expended.
+                ld          fuel_use, 0
+                ld          fuel, 64
+
+                ; Setup the initial delay and start falling.
+                ld          v0, g
+                ld          dt, v0
+
+                ; Display it.
+                call        draw_lander
+                ret
+
+
+;; Initialize the ground and pick a random platform.
+;;
+init_ground     ld          v8, 0
+
+                ; Pick a random, initial elevation. (rnd(22)+42)
+                rnd         v7, 15
+                rnd         v0, 7
+                add         v7, v0
+                add         v7, 42
+
+                ; Terrain is broken up into 3, 5-byte "features." The
+                ; first 4 features go up and the next 4 go down. A
+                ; random (0-3) feature is chosen, and if the current
+                ; elevation is too high already then add 4 to shift into
+                ; the downward elevation set.
+                ;
+                call        pick_feature
+                call        pick_feature
+                call        pick_feature
+
+                ; Done.
+                ret
+
+                ; Pick a random feature.
+pick_feature    rnd         v0, 3
+
+                ; Shift into the downward feature set if elevation is high.
+                ld          v1, 48
+                sub         v1, v7
+                se          vf, 1
+                add         v0, 4
+
+                ; Multiply by 8 to get to the right feature.
+                shl         v0
+                shl         v0
+                shl         v0
+
+                ; Load the feature data (5 bytes long).
+                ld          i, features
+                add         i, v0
+                ld          v6, [i]
+
+                ; Add the current elevation to each delta.
+                add         v0, v7
+                add         v1, v7
+                add         v2, v7
+                add         v3, v7
+                add         v4, v7
+
+                ; Update the elevation.
+                ld          v7, v4
+
+                ; Write the elevations to memory.
+                ld          i, elevation
+                add         i, v8
+                ld          [i], v4
+
+                ; Draw each elevation.
+                call        draw_elevation
+                ld          v0, v1
+                call        draw_elevation
+                ld          v0, v2
+                call        draw_elevation
+                ld          v0, v3
+                call        draw_elevation
+                ld          v0, v4
+                call        draw_elevation
+                ret
+
+                ; Calculate the actual elevation (64-v3)
+draw_elevation  ld          i, ground
+
+                ; v9=v8*8 (x coordinate)
+                ld          v9, v8
+                shl         v9
+                shl         v9
+                shl         v9
+
+                ; Advance the terrain X.
+                add         v8, 1
+
+                ; va=v0 (y coordinate)
+                ld          va, v0
+
+                ; Draw the ground sprite.
+draw_ground     drw         v9, va, 14
+                add         va, 14
+                ld          vb, 64
+                sub         vb, va
+                se          vf, 0           ; va >= 64
+                jp          draw_ground
+                ret
+
+
+;; Find the lowest spot (that's visible) and use it for the target.
+;;
+init_platform   ld          v2, 0       ; lowest
+                ld          v1, 0       ; current x
+
+                ; Load the terrain elevation at v1.
+next_x          ld          i, elevation
+                add         i, v1
+                ld          v0, [i]
+
+                ; Is it too low?
+                ld          v3, 64
+                subn        v3, v0
+                se          vf, 0
+                jp          not_lower
+
+                ; Pick a random number so it's not ALWAYS the lowest.
+                rnd         v3, #f
+                add         v0, v3
+
+                ; Is it lower than our current lowest (v2)?
+                ld          v3, v2
+                sub         v3, v0
+
+                ; If so, update platform position
+                se          vf, 0
+                jp          not_lower
+
+                ; Update lowest and x.
+                ld          plat_x, v1
+                ld          v2, v0
+
+                ; Next.
+not_lower       add         v1, 1
+                se          v1, #10
+                jp          next_x
+
+                ; Reload the height.
+                ld          i, elevation
+                add         i, plat_x
+                ld          v0, [i]
+
+                ; Set the platform X position (plat_x * 3)
+                shl         plat_x
+                shl         plat_x
+                shl         plat_x
+
+                ; Draw the platform at the proper elevation.
+                ld          i, platform
+                drw         plat_x, v0, 1
+                ret
+
+
+;; Add in rough terrain to make it a bit more smooth.
+;;
+smooth_terrain  ld          v2, 0
+
+                ; Get the x coordinate of this terrain block
+next_block      ld          v1, v2
+                shl         v1
+                shl         v1
+                shl         v1
+
+                ; If this is where the platform is, skip it.
+                sne         v1, plat_x
+                jp          no_cap
+
+                ; Load the elevation at that point.
+                ld          i, elevation
+                add         i, v2
+                ld          v0, [i]
+                add         v0, -2
+
+                ; Pick a random terrain cap.
+                ld          i, terrain_caps
+                rnd         v3, 7
+                shl         v3
+                add         i, v3
+                drw         v1, v0, 2
+
+                ; Advance to the next terrain block.
+no_cap          add         v2, 1
+                se          v2, 15
+                jp          next_block
+                ret
+
+
+;; Called every iteration. Checks if the delay has expired and
+;; then applies gravity to the VY vector.
+;;
+gravity         ld          v0, dt
+                se          v0, 0
+                jp          apply_vy
+
+                ; Increase the downward velocity of the lander.
+                add         vy, 1
+
+                ; Reset the delay timer.
+                ld          v0, g
+                ld          dt, v0
+
+                ; If the thrust is visible, hide it.
+                ld          v0, r
+                se          v0, 0
+                call        draw_thrust
+
+                ; Apply VY to the thrust vector.
+apply_vy        add         thrust, vy
+
+                ; Should the lander fall to the ground?
+                ld          v0, #c0
+                sub         v0, thrust
+                sne         vf, 0
+                jp          drop_lander
+
+                ; Should the lander climb higher?
+                ld          v0, #40
+                sub         v0, thrust
+                sne         vf, 0
+                ret
+
+                ; Launch the lander higher.
+                call        hide_lander
+                add         y, -1
+                call        draw_lander
+
+                ; Reset the thrust vector.
+                add         thrust, #40
+                add         thrust, v0
+                ret
+
+                ; The lander should fall a bit.
+drop_lander     call        hide_lander
+                add         y, 1
+                call        draw_lander
+
+                ; Did the lander hit the ground?
+                se          vf, 0
+                jp          land
+
+                ; Reset the thrust vector.
+                add         thrust, -64 ; #40
+                ret
+
+                ; The lander collided with the ground.
+land            call        hide_lander
+                add         y, -1
+                call        draw_lander
+
+                ; Is the lander not on the platform?
+                add         plat_x, -1
+                sgt         x, plat_x
+                jp          crash
+                add         plat_x, 6
+                slt         x, plat_x
+                jp          crash
+
+                ; Is VY too fast?
+                ld          v0, 12
+                slt         vy, v0
+                jp          crash
+
+                ; Take the absolute value of VX.
+                ld          v0, #80
+                sub         v0, vx
+                se          vf, 0
+                jp          skip_neg
+
+                ; Negate VX.
+                ld          v0, #ff
+                xor         vx, v0
+                add         vx, 1
+
+                ; Is VX too fast?
+skip_neg        ld          v0, 8
+                slt         vx, v0
+                jp          crash
+
+                ; Add points just for landing.
+                ld          vf, 25
+                call        inc_score
+
+                ; Get more points from any left over fuel.
+                call        fuel_bonus
+
+                ; Write a byte indicating the lander has landed.
+                ld          v0, 1
+                ld          i, landed
+                ld          [i], v0
+
+                ; Reset and start the next level.
+                ret
+
+
+;; The lander didn't land on the platform or was going too fast.
+;;
+crash           call        draw_lander
+                ld          v0, 20
+                ld          st, v0
+
+                ; Draw the explosion animation.
+                ld          i, explosion
+                ld          vd, 8
+                ld          v1, 0
+                ld          v2, 5
+
+                ; Draw next frame.
+draw_exp        drw         x, y, 5
+                ld          dt, vd
+
+                ; Wait a before showing the next frame.
+wait_0          ld          v0, dt
+                se          v0, 0
+                jp          wait_0
+
+                ; Have all 5 frames drawn?
+                drw         x, y, 5
+                add         i, v2
+                add         v1, 1
+                se          v1, 5
+                jp          draw_exp
+                jp          game_over
+
+
+;; Called every iteration, Applies VX to the tilt vector and
+;; determines if the lander should move left or right.
+;;
+move            add         tilt, vx
+
+                ; Should the lander list to the left?
+tilt_left       ld          v0, #40
+                subn        v0, tilt
+                se          vf, 0
+                jp          tilt_right
+
+                ; Move and redraw the lander.
+                call        hide_lander
+                add         x, -1
+                call        draw_lander
+
+                ; Did the lander crash into something?
+                se          vf, 0
+                jp          crash
+
+                ; Reset the tilt vector.
+                add         tilt, #40
+                ret
+
+                ; Should the lander list to the right?
+tilt_right      ld          v0, #c0
+                sub         v0, tilt
+                se          vf, 0
+                ret
+
+                ; Move and redraw the lander.
+                call        hide_lander
+                add         x, 1
+                call        draw_lander
+
+                ; Did the lander crash into something?
+                se          vf, 0
+                jp          crash
+
+                ; Reset the tilt vector.
+                add         tilt, -64 ; #40
+                ret
+
+
+;; Called once per iteration to process controls.
+;;
+input           ld          v0, up
+                sknp        v0
+                call        thrust_up
+                ld          v0, left
+                sknp        v0
+                call        thrust_left
+                ld          v0, right
+                sknp        v0
+                jp          thrust_right
+                ret
+
+                ; Expend a good amount of fuel.
+thrust_up       ld          v0, #C0
+                call        spend_fuel
+
+                ; Does the player have fuel left?
+                se          vf, 1
+                ret
+
+                ; Add to the VY vector, but not too much.
+                add         vy, -2
+
+                ; Play a little bloop sound.
+                ld          v0, 1
+                ld          st, v0
+
+                ; Show the thrust.
+                jp          draw_thrust
+
+                ; Spend some fuel to thrust sideways.
+thrust_left     ld          v0, #60
+                call        spend_fuel
+
+                ; Is there any fuel left?
+                se          vf, 1
+                ret
+
+                ; Update the tilt vector.
+                se          vx, -60
+                add         vx, -2
+                ret
+
+                ; Spend some fuel to thrust sideways.
+thrust_right    ld          v0, #60
+                call        spend_fuel
+
+                ; Is there any fuel left?
+                se          vf, 1
+                ret
+
+                ; Update the tilt vector.
+                se          vx, 60
+                add         vx, 2
+                ret
+
+
+;; Called when thrusting to use some more fuel. V0 should
+;; contain the amount of fuel to use. VF will be 0 if there
+;; is no more fuel to spend.
+;;
+spend_fuel      ld          vf, 0
+                sne         fuel, 64
+                ret
+
+                ; Spend the fuel request in V0.
+                sub         fuel_use, v0
+                se          vf, 0
+                ret
+
+                ; A bar of fuel has been spent.
+                ld          i, fuel_bar
+                ld          v0, 120
+                drw         v0, fuel, 1
+                add         fuel, 1
+                ld          vf, 1
+                ret
+
+
+;; Call to erase or redraw the lander sprite.
+;;
+hide_lander     ld          v0, r
+                se          v0, 0
+                call        draw_thrust
+draw_lander     ld          i, lander
+                drw         x, y, 5
+                ret
+draw_thrust     ld          i, lander_thrust
+                ld          v0, y
+                add         v0, 5
+                drw         x, v0, 3
+
+                ; Toggle whether or not the thrust is visible.
+                ld          v0, r
+                ld          v1, 1
+                xor         v0, v1
+                ld          r, v0
+                ret
+
+
+;; Add points to the score. VF=points to add.
+;;
+inc_score       ld          i, score
+                ld          v1, [i]
+
+                ; Increment, add carry to v1.
+                add         v0, vf
+                add         v1, vf
+
+                ; Save the score back to memory.
+write_score     ld          [i], v1
+                ret
+
+
+;; Player completely ran out of points. Game over.
+game_over       cls
+
+                ; Get the text.
+                ld          i, game_over_text
+                ld          v2, 5
+                ld          v0, 45
+                ld          v1, 25
+
+                ; Display GAME OVER.
+                drw         v0, v1, 5 ; G
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5 ; A
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5 ; M
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5 ; E
+                add         v0, 6
+                add         i, v2
+                drw         v0, v1, 5 ; O
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5 ; V
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5 ; E
+                add         v0, 4
+                add         i, v2
+                drw         v0, v1, 5 ; R
+
+                ; Display the final score.
+                call        draw_score
+                exit
+
+
+;; Draw the border that wraps the fuel tank.
+;;
+init_border     ld          i, border
+                ld          v0, 120
+                ld          v1, 0
+
+                ; Draw the border completely.
+draw_border     drw         v0, v1, 8
+                add         v1, 8
+                se          v1, 64
+                jp          draw_border
+                ret
+
+
+;; Keep adding fuel back until it is full.
+;;
+fill_tank       ld          i, fuel_text
+                ld          v0, 120
+                ld          v1, 0
+
+                ; Draw the "fuel" sprite.
+                drw         v0, v1, 12
+                add         v1, 12
+                add         i, v1
+                drw         v0, v1, 11
+
+                ; Fill up the fuel bar.
+                ld          i, fuel_bar
+                ld          fuel, 64
+add_fuel        add         fuel, -1
+                drw         v0, fuel, 1
+
+                ; Stop when full.
+                se          fuel, 0
+                jp          add_fuel
+                ret
+
+
+;; Take the rest of the fuel and add it to the score.
+;;
+fuel_bonus      sne         fuel, 64
+                ret
+
+                ; Erase the next level of fuel.
+                ld          i, fuel_bar
+                ld          v0, 120
+                drw         v0, fuel, 1
+
+                ; Take away from the fuel and add score.
+                add         fuel, 1
+                ld          vf, 2
+                call        inc_score
+
+                ; Keep going until fuel is gone.
+                jp          fuel_bonus
+
+
+;; Scratch memory for all kinds of things (like BCD)...
+;;
+scratch         pad         16
+
+
+;; The score is stored here in memory.
+;;
+score           word        0
+
+
+;; This memory location contains the level number.
+;;
+level           byte        0
+
+
+;; This memory location is non-zero once the lander has landed!
+;;
+landed          byte        0
+
+
+;; Contains the height of the ground every 8 pixels.
+;;
+elevation       pad         15
+
+
+;; This is the FUEL gauge text. It's a tall, vertical sprite.
+;;
+fuel_text       byte        %...111..
+                byte        %...1....
+                byte        %...11...
+                byte        %...1....
+                byte        %...1....
+                byte        %........
+                byte        %...1.1..
+                byte        %...1.1..
+                byte        %...1.1..
+                byte        %...1.1..
+                byte        %...111..
+                byte        %........
+                byte        %...111..
+                byte        %...1....
+                byte        %...111..
+                byte        %...1....
+                byte        %...111..
+                byte        %........
+                byte        %...1....
+                byte        %...1....
+                byte        %...1....
+                byte        %...1....
+                byte        %...111..
+
+
+;; A single line of the fuel gauge used.
+;;
+fuel_bar        byte        %..11111.
+
+
+;; Border that surrounds the fuel gauge. It's there so the lander
+;; collides when too far right, but also too far left when wrapping
+;; video memory.
+;;
+border          word        #4141,#4141,#4141,#4141
+
+
+;; Displayed when game is over.
+;;
+game_over_text  byte        %.11.....
+                byte        %1.......
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %.11.....
+
+                byte        %.1......
+                byte        %1.1.....
+                byte        %111.....
+                byte        %1.1.....
+                byte        %1.1.....
+
+                byte        %1.1.....
+                byte        %111.....
+                byte        %111.....
+                byte        %1.1.....
+                byte        %1.1.....
+
+                byte        %111.....
+                byte        %1.......
+                byte        %11......
+                byte        %1.......
+                byte        %111.....
+
+                byte        %.1......
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %.1......
+
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %.1......
+
+                byte        %111.....
+                byte        %1.......
+                byte        %11......
+                byte        %1.......
+                byte        %111.....
+
+                byte        %11......
+                byte        %1.1.....
+                byte        %11......
+                byte        %1.1.....
+                byte        %1.1.....
+
+
+;; Displayed at the start of the next level with the score.
+;;
+level_text      byte        %1.......
+                byte        %1.......
+                byte        %1.......
+                byte        %1.......
+                byte        %111.....
+
+                byte        %111.....
+                byte        %1.......
+                byte        %11......
+                byte        %1.......
+                byte        %111.....
+
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %.1......
+
+                byte        %111.....
+                byte        %1.......
+                byte        %11......
+                byte        %1.......
+                byte        %111.....
+
+                byte        %1.......
+                byte        %1.......
+                byte        %1.......
+                byte        %1.......
+                byte        %111.....
+
+
+;; Displayed each level.
+;;
+score_text      byte        %.11.....
+                byte        %1.......
+                byte        %.1......
+                byte        %..1.....
+                byte        %11......
+
+                byte        %.11.....
+                byte        %1.......
+                byte        %1.......
+                byte        %1.......
+                byte        %.11.....
+
+                byte        %.1......
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %1.1.....
+                byte        %.1......
+
+                byte        %11......
+                byte        %1.1.....
+                byte        %11......
+                byte        %1.1.....
+                byte        %1.1.....
+
+                byte        %111.....
+                byte        %1.......
+                byte        %11......
+                byte        %1.......
+                byte        %111.....
+
+
+;; Ground bitmap. The Platform bitmap is offset by a byte so that when
+;; the two overlap the platform will be solid.
+;;
+ground          byte        %1.1.1.1.
+platform        byte        %.1.1.1.1
+                byte        %1.1.1.1.
+                byte        %.1.1.1.1
+                byte        %1.1.1.1.
+                byte        %.1.1.1.1
+                byte        %1.1.1.1.
+                byte        %.1.1.1.1
+                byte        %1.1.1.1.
+                byte        %.1.1.1.1
+                byte        %1.1.1.1.
+                byte        %.1.1.1.1
+                byte        %1.1.1.1.
+                byte        %.1.1.1.1
+
+;; These are the sprite "caps" on the top of terrains that do not have
+;; the platform. They are intended to give variation and smooth the
+;; terrain out a bit. Each is just two bytes rendered on top of each
+;; elevation.
+;;
+terrain_caps    byte        %..1.1...
+                byte        %.1.1.1..
+
+                byte        %..1.....
+                byte        %.1.1.1..
+
+                byte        %....1...
+                byte        %.1.1.1..
+
+                byte        %........
+                byte        %.1.1....
+
+                byte        %........
+                byte        %...1.1..
+
+                byte        %......1.
+                byte        %.1...1.1
+
+                byte        %..1.....
+                byte        %.1.1....
+
+                byte        %........
+                byte        %.1...1..
+
+;; Lander sprite.
+;;
+lander          byte        %.111....
+                byte        %11111...
+                byte        %11111...
+                byte        %.1.1....
+                byte        %11.11...
+lander_thrust   byte        %.1.1....
+                byte        %..1.....
+                byte        %..1.....
+
+;; Explosion animation (5, 5x5 frames).
+explosion       byte        %........
+                byte        %..1.....
+                byte        %.1.1....
+                byte        %..1.....
+                byte        %........
+
+                byte        %........
+                byte        %.1.1....
+                byte        %..1.....
+                byte        %.1.1....
+                byte        %........
+
+                byte        %........
+                byte        %.1.1....
+                byte        %1...1...
+                byte        %.1.1....
+                byte        %........
+
+                byte        %.1.1....
+                byte        %1...1...
+                byte        %........
+                byte        %1...1...
+                byte        %.1.1....
+
+                byte        %1.1.1...
+                byte        %........
+                byte        %1...1...
+                byte        %........
+                byte        %1.1.1...
+
+;; There are 8 possible terrain "features", each is 5-bytes long with
+;; 3 padding bytes for easy shifting.
+;;
+features        byte        8,  16,  22,  28,  34,   0, 0, 0
+                byte        8,   4,   4,  12,  18,   0, 0, 0
+                byte        6,  12,  18,  18,  24,   0, 0, 0
+                byte       -4,   2,   8,  14,  20,   0, 0, 0
+
+                byte       -8, -16, -22, -28, -34,   0, 0, 0
+                byte       -8,  -4,  -4, -12, -18,   0, 0, 0
+                byte       -6, -12, -18, -18, -24,   0, 0, 0
+                byte       -4,  -2,  -8, -14, -20,   0, 0, 0
