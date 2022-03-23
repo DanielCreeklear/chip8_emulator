@@ -1,4 +1,9 @@
 # CHIP-8 emulator
+![GitHub repo size](https://img.shields.io/github/repo-size/danielcreeklear/chip8_emulator?style=for-the-badge)
+![GitHub language count](https://img.shields.io/github/languages/count/danielcreeklear/chip8_emulator?style=for-the-badge)
+![GitHub last commit](https://img.shields.io/github/last-commit/danielcreeklear/chip8_emulator?style=for-the-badge)
+![GitHub Release Date](https://img.shields.io/github/release-date/danielcreeklear/chip8_emulator?style=for-the-badge)
+![GitHub license](https://img.shields.io/github/license/danielcreeklear/chip8_emulator?style=for-the-badge)
 <img src="./img/chip8_gameover.png"/>
 <p>An emulator of CHIP-8, written in C++.</p>
 <p>"CHIP-8 is an interpreted programming language, developed by Joseph Weisbecker. It was initially used on the COSMAC VIP and Telmac 1800 8-bit microcomputers in the mid-1970s. CHIP-8 programs are run on a CHIP-8 virtual machine. It was made to allow video games to be more easily programmed for these computers, but CHIP 8 is still used today, due to its simplicity, and consequently on any platform and its teaching of programming Binary numbers."</p>
