@@ -1,8 +1,11 @@
 #pragma once
 #include <random>
+#include <iostream>
 #include <chrono>
 #include "utils.h"
 #include "clock.h"
+
+using namespace std;
 
 const int MAX_ADDRESS_MEMORY = 0x1000;
 const int MAX_REGISTERS = 16;

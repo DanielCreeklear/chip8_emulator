@@ -48,7 +48,7 @@ void Cpu::emulateCycle()
         unsigned short X = ((opcode & 0x0F00) >> 8);
         unsigned short Y = ((opcode & 0x00F0) >> 4);
 
-        //cout << "opcode: 0x" << hex << opcode << endl;
+        cout << "opcode: 0x" << hex << opcode << endl;
         switch (opcode & 0xF000)
         {
             case 0x0000:
@@ -317,7 +317,10 @@ bool Cpu::loadGame(char* gameName)
 
     if (0x1000 - 0x200 > fileData.length())
     {
-        for (int i = 0; i < fileData.length(); i++) memory[i + 512] = fileData[i];
+        for (int i = 0; i < fileData.length(); i++)
+        {
+            memory[i + 512] = fileData[i];
+        }
     }
     else
     {

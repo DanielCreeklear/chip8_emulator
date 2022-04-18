@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Graphics.cpp" />
+    <ClCompile Include="src\Emulator.cpp" />
     <ClCompile Include="src\clock.cpp" />
     <ClCompile Include="src\cpu.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -31,9 +33,11 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\configs.h" />
+    <ClInclude Include="src\Graphics.h" />
+    <ClInclude Include="src\Emulator.h" />
     <ClInclude Include="src\clock.h" />
     <ClInclude Include="src\cpu.h" />
-    <ClInclude Include="src\main.h" />
     <ClInclude Include="src\utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
