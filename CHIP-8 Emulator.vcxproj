@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Graphics.cpp" />
+    <ClCompile Include="src\Gpu.cpp" />
     <ClCompile Include="src\Emulator.cpp" />
     <ClCompile Include="src\clock.cpp" />
     <ClCompile Include="src\cpu.cpp" />
@@ -34,7 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\configs.h" />
-    <ClInclude Include="src\Graphics.h" />
+    <ClInclude Include="src\Gpu.h" />
     <ClInclude Include="src\Emulator.h" />
     <ClInclude Include="src\clock.h" />
     <ClInclude Include="src\cpu.h" />
