@@ -20,12 +20,12 @@ void idle();
 void keyDown(unsigned char key, int x, int y);
 void keyUp(unsigned char key, int x, int y);
 
-class Graphics
+class Gpu
 {
 private:
 	void buildWindow(int width, int height, std::string title);
 
 public:
-	Graphics(int width, int height, std::string *title, Cpu *cpu, std::unordered_map<char, int> *keysMap);
+	Gpu(int width, int height, std::string *title, Cpu *cpu, std::unordered_map<char, int> *keysMap);
 };
 

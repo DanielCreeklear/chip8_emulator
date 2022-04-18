@@ -1,6 +1,6 @@
-#include "Graphics.h"
+#include "Gpu.h"
 
-Graphics::Graphics(int width, int height, std::string *title, Cpu *cpu, std::unordered_map<char, int> *keysMap)
+Gpu::Gpu(int width, int height, std::string *title, Cpu *cpu, std::unordered_map<char, int> *keysMap)
 {
 	keysMapGraphics = keysMap;
 	cpuGraphics = cpu;
@@ -18,7 +18,7 @@ Graphics::Graphics(int width, int height, std::string *title, Cpu *cpu, std::uno
 	glClearColor(0, 0, 0, 0);
 }
 
-void Graphics::buildWindow(int width, int height, std::string title)
+void Gpu::buildWindow(int width, int height, std::string title)
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
