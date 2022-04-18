@@ -13,10 +13,10 @@ struct Key
 class Emulator
 {
 private:
-	std::unordered_map<char, int> *keysMapEmulator;
+	std::unordered_map<char, int> *keysMap;
 	Cpu *cpu;
 
-	void setkeysMapEmulator();
+	void setkeysMap();
 	void setKeyMap(Key key);
 
 public:

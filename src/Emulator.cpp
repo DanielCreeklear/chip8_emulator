@@ -2,10 +2,10 @@
 
 Emulator::Emulator(int width, int height, char *game, Cpu *cpu, std::unordered_map<char, int> *keysMap)
 {
-	keysMapEmulator = keysMap;
+	keysMap = keysMap;
 	cpu = cpu;
 
-	//setkeysMapEmulator();
+	//setkeysMap();
 
 	cpu->initialize(2.0f);
 	cpu->loadGame(game);
@@ -13,7 +13,7 @@ Emulator::Emulator(int width, int height, char *game, Cpu *cpu, std::unordered_m
 	glutMainLoop();
 }
 
-void Emulator::setkeysMapEmulator()
+void Emulator::setkeysMap()
 {
 	std::vector<Key> keys;
 
@@ -40,5 +40,5 @@ void Emulator::setkeysMapEmulator()
 
 void Emulator::setKeyMap(Key key)
 {
-	keysMapEmulator->insert(std::make_pair(key.key, key.index));
+	keysMap->insert(std::make_pair(key.key, key.index));
 }

@@ -1,6 +1,6 @@
 #include <gl/glut.h>
 #include "Emulator.h"
-#include "Graphics.h"
+#include "Gpu.h"
 #include "configs.h"
 #include "cpu.h"
 
