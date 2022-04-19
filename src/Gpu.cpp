@@ -1,14 +1,16 @@
 #include "Gpu.h"
 
-Gpu::Gpu(int width, int height, std::string *title, Cpu *cpu, std::unordered_map<char, int> *keysMap)
+Gpu::Gpu()
 {
-	keysMapGraphics = keysMap;
-	cpuGraphics = cpu;
-	buildWindow(width, height, *title);
-	//buildScreenBuffer(width, height);
-	title = title;
 
-	//startTimer = clock();
+}
+
+void Gpu::init(int width, int height, std::string *title)
+{
+	buildWindow(width, height, *title);
+	buildScreenBuffer(width, height);
+
+	startTimer = clock();
 
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
@@ -27,7 +29,16 @@ void Gpu::buildWindow(int width, int height, std::string title)
 	glutCreateWindow(title.c_str());
 }
 
-/*
+void setCpu(Cpu *cpu)
+{
+	cpuGraphics = cpu;
+}
+
+void setKeysMapGraphics(std::unordered_map<char, int> *keysMapGraphics)
+{
+	keysMapGraphics = keysMapGraphics;
+}
+
 void buildScreenBuffer(int width, int height)
 {
 	pixelBuffer = new uint8_t **[height];
@@ -41,7 +52,6 @@ void buildScreenBuffer(int width, int height)
 		}
 	}
 }
-*/
 
 void idle()
 {
@@ -49,31 +59,30 @@ void idle()
 
 	if (cpuGraphics->drawFlag)
 	{
-		//fps++;
+		fps++;
 		glutPostRedisplay();
 		cpuGraphics->drawFlag = false;
 
-		/*
-		if (((float)(clock() - startTimer)) / CLOCKS_PER_SEC >= 1)
+		if ((clock() - startTimer) / CLOCKS_PER_SEC >= 1)
 		{
-			std::string newTitle = title + (std::string)" - " + std::to_string(fps) + (std::string)" FPS";
-			glutSetWindowTitle(newTitle.c_str());
+			glutSetWindowTitle(((string)(std::to_string(fps) + " FPS")).c_str());
 			fps = 0;
 			startTimer = clock();
 		}
-		*/
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 }
 
 void update_display()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (int y = 0; y < 32; ++y)
 	{
 		for (int x = 0; x < 64; ++x)
 		{
-			if (cpuGraphics->gfx[x + y * 64] == 1)
+			int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+			if (cpuGraphics->gfx[x + y * 64] & 1)
 			{
 				glColor3f(1, 1, 1);
 			}
@@ -82,11 +91,13 @@ void update_display()
 				glColor3f(0, 0, 0);
 			}
 
+			int x1 = x * pixelSize, x2 = (x+1) * pixelSize;
+			int y1 = y * pixelSize, y2 = (y + 1) * pixelSize;
 			glBegin(GL_POLYGON);
-				glVertex2f((x * pixelSize), glutGet(GLUT_WINDOW_HEIGHT) - (y * pixelSize));
-				glVertex2f(((x + 1) * pixelSize), glutGet(GLUT_WINDOW_HEIGHT) - (y * pixelSize));
-				glVertex2f(((x + 1) * pixelSize), glutGet(GLUT_WINDOW_HEIGHT) - ((y + 1) * pixelSize));
-				glVertex2f((x * pixelSize), glutGet(GLUT_WINDOW_HEIGHT) - ((y + 1) * pixelSize));
+				glVertex2f(x1, windowHeight - y1);
+				glVertex2f(x2, windowHeight - y1);
+				glVertex2f(x2, windowHeight - y2);
+				glVertex2f(x1, windowHeight - y2);
 			glEnd();
 		}
 	}
@@ -95,7 +106,7 @@ void update_display()
 }
 
 void keyDown(unsigned char key, int x, int y) {
-	//std::cout << keysMapGraphics[key] << std::endl;
+	//std::cout << "Key Down = " << key << std::endl;
 	//cpuGraphics->key[keysMapGraphics[key]] = 1;
 	if (key == '1') cpuGraphics->key[1] = 1;
 	if (key == '2') cpuGraphics->key[2] = 1;
@@ -116,6 +127,7 @@ void keyDown(unsigned char key, int x, int y) {
 }
 
 void keyUp(unsigned char key, int x, int y) {
+	//std::cout << "Key Up = " << key << std::endl;
 	//cpuGraphics->key[keysMapGraphics[key]] = 0;
 	if (key == '1') cpuGraphics->key[1] = 0;
 	if (key == '2') cpuGraphics->key[2] = 0;

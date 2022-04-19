@@ -1,11 +1,14 @@
 #include "Emulator.h"
 
-Emulator::Emulator(int width, int height, char *game, Cpu *cpu, std::unordered_map<char, int> *keysMap)
+Emulator::Emulator(int width, int height, char *game, std::string* title, Cpu *cpu, std::unordered_map<char, int> *keysMap)
 {
 	keysMap = keysMap;
 	cpu = cpu;
+	setCpu(cpu);
+	setKeysMapGraphics(keysMap);
 
 	//setkeysMap();
+	init(width, height, title);
 
 	cpu->initialize(2.0f);
 	cpu->loadGame(game);
@@ -35,10 +38,10 @@ void Emulator::setkeysMap()
 	keys.push_back({'4', 15});
 	keys.push_back({'x', 0});;
 
-	for (Key key : keys) setKeyMap(key);
+	//for (Key key : keys) setKeyMap(key);
 }
 
 void Emulator::setKeyMap(Key key)
 {
-	keysMap->insert(std::make_pair(key.key, key.index));
+	keysMap->insert(pair<char, int> {key.key, key.index});
 }
