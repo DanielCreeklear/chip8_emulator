@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
-#include <gl/glut.h>
 #include "cpu.h"
+#include "Gpu.h"
 
 struct Key
 {
@@ -10,7 +10,7 @@ struct Key
 };
 
 
-class Emulator
+class Emulator : public Gpu
 {
 private:
 	std::unordered_map<char, int> *keysMap;
@@ -20,5 +20,5 @@ private:
 	void setKeyMap(Key key);
 
 public:
-	Emulator(int width, int height, char *game, Cpu *cpu, std::unordered_map<char, int> *keysMap);
+	Emulator(int width, int height, char *game, std::string *title, Cpu *cpu, std::unordered_map<char, int> *keysMap);
 };
