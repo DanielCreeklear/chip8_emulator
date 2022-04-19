@@ -16,10 +16,8 @@ class Cpu
 {
     private:
         unsigned short opcode;
-        unsigned char memory[MAX_ADDRESS_MEMORY];
         unsigned char V[MAX_REGISTERS];
         unsigned short I;
-        unsigned short pc;
         
         unsigned char delay_timer;
         unsigned char sound_timer;
@@ -55,8 +53,10 @@ class Cpu
         Cpu();
 
         bool drawFlag;
+        unsigned short pc;
         unsigned char gfx[WIDTH * HEIGHT];
         unsigned key[0x10];
+        unsigned char memory[MAX_ADDRESS_MEMORY];
 
         void initialize(const float mhz);
         void emulateCycle();
