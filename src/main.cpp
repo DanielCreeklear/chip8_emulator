@@ -3,7 +3,6 @@
 #include "configs.h"
 #include "cpu.h"
 
-
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
