@@ -2,6 +2,7 @@
 #include <random>
 #include <iostream>
 #include <chrono>
+#include <thread>
 #include "utils.h"
 #include "clock.h"
 
@@ -26,6 +27,14 @@ class Cpu
         unsigned short sp;
 
         bool jumpFlag, skipFlag;
+
+        unsigned short pixelX;
+        unsigned short pixelY;
+        unsigned short height;
+        unsigned short pixelRow;
+        bool keyPressed;
+
+        unsigned short X, Y;
 
         unsigned char chip8_fontset[80] =
         { 

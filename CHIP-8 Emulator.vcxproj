@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\audio.cpp" />
     <ClCompile Include="src\Gpu.cpp" />
     <ClCompile Include="src\Emulator.cpp" />
     <ClCompile Include="src\clock.cpp" />
@@ -33,6 +34,7 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\audio.h" />
     <ClInclude Include="src\configs.h" />
     <ClInclude Include="src\Gpu.h" />
     <ClInclude Include="src\Emulator.h" />

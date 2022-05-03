@@ -55,33 +55,45 @@ void buildScreenBuffer(int width, int height)
 
 void idle()
 {
-	cpuGraphics->emulateCycle();
-
-	if (cpuGraphics->drawFlag)
+	if (fps <= 60)
 	{
-		fps++;
-		glutPostRedisplay();
-		cpuGraphics->drawFlag = false;
+		cpuGraphics->emulateCycle();
 
-		if ((clock() - startTimer) / CLOCKS_PER_SEC >= 1)
+		if (cpuGraphics->drawFlag)
 		{
-			glutSetWindowTitle(((string)(std::to_string(fps) + " FPS")).c_str());
-			fps = 0;
-			startTimer = clock();
+			glutPostRedisplay();
+
+			fps++;
+
+
+			if ((clock() - startTimer) / CLOCKS_PER_SEC > 1)
+			{
+				glutSetWindowTitle(((string)(std::to_string(fps) + " FPS")).c_str());
+				fps = 0;
+				startTimer = clock();
+			}
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			cpuGraphics->drawFlag = false;
 		}
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	else
+	{
+		fps = 0;
 	}
 }
 
 void update_display()
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+	int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (int y = 0; y < 32; ++y)
 	{
 		for (int x = 0; x < 64; ++x)
 		{
-			int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 			if (cpuGraphics->gfx[x + y * 64] & 1)
 			{
 				glColor3f(1, 1, 1);
@@ -91,8 +103,9 @@ void update_display()
 				glColor3f(0, 0, 0);
 			}
 
-			int x1 = x * pixelSize, x2 = (x+1) * pixelSize;
+			int x1 = x * pixelSize, x2 = (x + 1) * pixelSize;
 			int y1 = y * pixelSize, y2 = (y + 1) * pixelSize;
+
 			glBegin(GL_POLYGON);
 				glVertex2f(x1, windowHeight - y1);
 				glVertex2f(x2, windowHeight - y1);
@@ -101,12 +114,13 @@ void update_display()
 			glEnd();
 		}
 	}
+
 	glFlush();
 	glutSwapBuffers();
 }
 
-void keyDown(unsigned char key, int x, int y) {
-	//std::cout << "Key Down = " << key << std::endl;
+void keyDown(unsigned char key, int x, int y) 
+{
 	//cpuGraphics->key[keysMapGraphics[key]] = 1;
 	if (key == '1') cpuGraphics->key[1] = 1;
 	if (key == '2') cpuGraphics->key[2] = 1;
@@ -126,8 +140,8 @@ void keyDown(unsigned char key, int x, int y) {
 	if (key == 'x') cpuGraphics->key[0] = 1;
 }
 
-void keyUp(unsigned char key, int x, int y) {
-	//std::cout << "Key Up = " << key << std::endl;
+void keyUp(unsigned char key, int x, int y) 
+{
 	//cpuGraphics->key[keysMapGraphics[key]] = 0;
 	if (key == '1') cpuGraphics->key[1] = 0;
 	if (key == '2') cpuGraphics->key[2] = 0;
