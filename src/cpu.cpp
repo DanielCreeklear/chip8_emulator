@@ -58,7 +58,7 @@ void Cpu::emulateCycle()
                 break;
             
                 default:
-                    //cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                    cout << "Unknown opcode: 0x" << hex << opcode << endl;
                     
                 break;
             }
@@ -161,7 +161,7 @@ void Cpu::emulateCycle()
                 break;
                 
                 default:
-                    //cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                    cout << "Unknown opcode: 0x" << hex << opcode << endl;
                     
                 break;
             }
@@ -218,7 +218,7 @@ void Cpu::emulateCycle()
                 break;
 
                 default:
-                    //cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                    cout << "Unknown opcode: 0x" << hex << opcode << endl;
                     
                 break;
             }
@@ -275,14 +275,14 @@ void Cpu::emulateCycle()
                 break;
             
                 default:
-                    //cout << "Unknown opcode: 0x" << hex << opcode << endl;
+                    cout << "Unknown opcode: 0x" << hex << opcode << endl;
                     
                 break;
             }
         break;
 
         default:
-            //cout << "Unknown opcode: 0x" << hex << opcode << endl;
+            cout << "Unknown opcode: 0x" << hex << opcode << endl;
             
         break;
     }
@@ -376,6 +376,23 @@ void Cpu::timerCycle()
     
     if (sound_timer > 0)
     {
-        sound_timer--;
+        if (audio.isTimerRunning())
+        {
+            if (audio.getTimerRemain() == 0)
+            {
+                sound_timer--;
+                audio.resetTimer();
+            }
+
+            if (sound_timer == 0)
+            {
+                audio.stopTimer();
+            }
+
+        }
+        else
+        {
+            audio.initTimer();
+        }
     }
 }

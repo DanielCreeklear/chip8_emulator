@@ -5,6 +5,7 @@
 #include <thread>
 #include "utils.h"
 #include "clock.h"
+#include "audio.h"
 
 using namespace std;
 
@@ -56,6 +57,7 @@ class Cpu
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
         };
         Clock clock;
+        Clock audio;
 
         void timerCycle();
     public:
