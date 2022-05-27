@@ -17,7 +17,7 @@ const int HEIGHT = 32;
 class Cpu
 {
     private:
-        unsigned short opcode;
+        unsigned short opcode, jump_addr;
         unsigned char V[MAX_REGISTERS];
         unsigned short I;
         
@@ -57,7 +57,7 @@ class Cpu
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
         };
         Clock clock;
-        Clock audio;
+        Audio audio;
 
         void timerCycle();
     public:
