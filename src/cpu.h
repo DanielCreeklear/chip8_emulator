@@ -1,5 +1,6 @@
 #pragma once
 #include <random>
+#include <string>
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -71,6 +72,6 @@ class Cpu
 
         void initialize(const float mhz);
         void emulateCycle();
-        bool loadGame(char*);
+        bool loadGame(string* gameName);
         void setKeys();
 };

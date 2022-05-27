@@ -1,13 +1,10 @@
 #include "Emulator.h"
 
-Emulator::Emulator(int width, int height, char *game, std::string* title, Cpu *cpu, std::unordered_map<char, int> *keysMap)
+Emulator::Emulator(int width, int height, string *game, std::string* title, Cpu *cpu)
 {
-	keysMap = keysMap;
 	cpu = cpu;
 	setCpu(cpu);
-	setKeysMapGraphics(keysMap);
 
-	//setkeysMap();
 	init(width, height, title);
 
 	cpu->initialize(2.0f);

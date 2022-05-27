@@ -5,19 +5,26 @@
 #include "cpu.h"
 
 
-
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
 	std::cout << "OpenGL initialized" << std::endl;
 	if (SDL_Init(SDL_INIT_AUDIO))
 		return 1;
-
+	string gamePath;
 	Cpu *cpu = new Cpu();
 
-	Emulator *emulator = new Emulator(640, 320, argv[1], &title, cpu, &keysMap);
-	//char game[] = "./games/invaders.c8";
-	//Emulator *emulator = new Emulator(640, 320, game, &title, cpu, &keysMap);
+	if (argc <= 1)
+	{
+		std::cout << "Enter the path with the file to read: ";
+		std::cin >> gamePath;
+	}
+	else
+	{
+		gamePath = argv[1];
+	}
+
+	Emulator *emulator = new Emulator(640, 320, &gamePath, &title, cpu);
 
     return 0;
 }

@@ -1,12 +1,12 @@
 #include "utils.h"
 
-bool loadFile(const char* fileName, std::stringstream& result)
+bool loadFile(std::string *fileName, std::stringstream& result)
 {
 	try
 	{
 		std::ifstream file;
 		file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		file.open(fileName);
+		file.open(fileName->c_str());
 		result << file.rdbuf();
 		file.close();
 

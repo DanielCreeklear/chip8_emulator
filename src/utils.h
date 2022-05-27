@@ -1,9 +1,10 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <memory>
 #include <fstream>
 #include <sstream>
 #include <string>
 
-bool loadFile(const char* fileName, std::stringstream& result);
+bool loadFile(std::string *fileName, std::stringstream& result);

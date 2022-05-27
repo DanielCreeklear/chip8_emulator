@@ -328,9 +328,9 @@ void Cpu::emulateCycle()
     timerCycle();
 }
 
-bool Cpu::loadGame(char* gameName)
+bool Cpu::loadGame(string *gameName)
 {
-    cout << "Loading: " << gameName << "\n";
+    cout << "Loading: " << *gameName << endl;
     stringstream fileGame;
     if (!loadFile(gameName, fileGame)) return false;
 
@@ -403,7 +403,6 @@ void Cpu::timerCycle()
         }
     }
     
-    //cout << "Sound timer = " << dec << (int)sound_timer << endl;
     if (sound_timer > 0)
     {
         sound_timer--;
