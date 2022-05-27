@@ -11,10 +11,8 @@
 <p><a href="https://en.wikipedia.org/wiki/CHIP-8" target="_blank">Wikipedia about CHIP-8</a></p>
 
 # About the project
-<p>The project was built with this <a href="http://devernay.free.fr/hacks/chip8/C8TECH10.HTM" target="_blank">documentation</a>.
-This documentation it's required for build the cpu, inputs and outputs of CHIP-8.</p>
-<p>The language chosen it's C++, there are plans to use this solution in a microcontroller, so
-the language can help to speed up future development, where i'll just need to rewrite a few things.</p>
+<p>The project was built with this <a href="http://devernay.free.fr/hacks/chip8/C8TECH10.HTM" target="_blank">documentation</a>.This documentation it's required for build the cpu, inputs and outputs of CHIP-8.</p>
+<p>The language chosen it's C++, there are plans to use this solution in a microcontroller, so the language can help to speed up future development, where i'll just need to rewrite a few things.</p>
 
 ## Graphics
 <img src="https://www.opengl.org/img/opengl_logo.jpg"/>
@@ -22,7 +20,7 @@ the language can help to speed up future development, where i'll just need to re
 
 ## Sound
 <img src="https://www.libsdl.org/media/SDL_logo.png"/>
-<p>To created sound of the emulator, <ahref="https://www.libsdl.org/" target="_blank">SDL2</a> is used.</p>
+<p>To created sound of the emulator, <a href="https://www.libsdl.org/" target="_blank">SDL2</a> is used.</p>
 
 # Version history
 
