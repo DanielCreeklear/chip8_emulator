@@ -12,6 +12,7 @@ Cpu::Cpu()
 void Cpu::initialize(const float mhz)
 {
     clock = Clock();
+    audio = Audio();
     pc = 0x200;
     opcode = 0;
     I = 0;
@@ -29,32 +30,40 @@ void Cpu::initialize(const float mhz)
 
     clock.init(mhz);
     for (int i = 0; i < 80; i++) memory[i] = chip8_fontset[i];
+
     srand(time(NULL));
 }
 
 void Cpu::emulateCycle()
 {
+
+    string aux;
     jumpFlag = false;
     skipFlag = false;
     opcode = memory[pc] << 8 | memory[pc + 1];
+    jump_addr = opcode & 0x0FFF;
     X = ((opcode & 0x0F00) >> 8);
     Y = ((opcode & 0x00F0) >> 4);
 
-    //cout << "Opcode = 0x" << hex << opcode << endl;
+    //cout << "==================Cyle=================" << endl;
+    //cout << "Program counter = " << dec << (int)pc << " ---- Opcode = 0x" << hex << opcode << endl;
 
     clock.initCycle();
     switch (opcode & 0xF000)
     {
         case 0x0000:
-            switch (opcode & 0x000F)
+            switch (opcode & 0x00FF)
             {
-                case 0x0000:
+                case 0x00E0:
                     for (int i = 0; i < WIDTH * HEIGHT; i++) gfx[i] = 0;
                     drawFlag = true;
                 break;
 
-                case 0x000E:
-                    pc = stack[--sp];
+                case 0x00EE:
+                    if (stack[sp] == 0) cout << "Invalid return from subroutine" << endl;
+                    pc = stack[sp];
+                    stack[sp] = 0;
+                    if (sp > 0) sp--;
                 break;
             
                 default:
@@ -65,26 +74,39 @@ void Cpu::emulateCycle()
         break;
 
         case 0x1000:
-            pc = opcode & 0x0FFF;
+            pc = jump_addr;
             jumpFlag = true;
         break;
 
         case 0x2000:
-            stack[sp++] = pc;
-            pc = opcode & 0x0FFF;
+            if (stack[sp] != 0) sp++;
+            stack[sp] = pc;
+            pc = jump_addr;
             jumpFlag = true;
         break;
 
         case 0x3000:
-            if (V[X] == (opcode & 0x00FF)) skipFlag = true;
+            if (V[X] == (opcode & 0x00FF))
+            {
+                pc += 2;
+                skipFlag = true;
+            }
         break;
 
         case 0x4000:
-            if ((V[X]) != (opcode & 0x00FF)) skipFlag = true;
+            if ((V[X]) != (opcode & 0x00FF))
+            {
+                pc += 2;
+                skipFlag = true;
+            }
         break;
 
         case 0x5000:
-            if ((V[X]) == V[Y]) skipFlag = true;
+            if ((V[X]) == V[Y])
+            {
+                pc += 2;
+                skipFlag = true;
+            }
 
         case 0x6000:
             V[X] = opcode & 0x00FF;
@@ -168,7 +190,11 @@ void Cpu::emulateCycle()
         break;
 
         case 0x9000:
-            if ((V[X]) != V[Y]) skipFlag = true;
+            if ((V[X]) != V[Y])
+            {
+                pc += 2;
+                skipFlag = true;
+            }
         break;
 
         case 0xA000:
@@ -176,7 +202,7 @@ void Cpu::emulateCycle()
         break;
 
         case 0xB000:
-            pc = (opcode & 0x0FFF) + V[0];
+            pc = jump_addr + V[0];
             jumpFlag = true;
         break;
 
@@ -210,11 +236,19 @@ void Cpu::emulateCycle()
             switch (opcode & 0x00FF)
             {
                 case 0x009E:
-                    if (key[V[X]] == 1) skipFlag = true;
+                    if (key[V[X]] == 1)
+                    {
+                        pc += 2;
+                        skipFlag = true;
+                    }
                 break;
 
                 case 0x00A1:
-                    if (key[V[X]] == 0) skipFlag = true;
+                    if (key[V[X]] == 0)
+                    {
+                        pc += 2;
+                        skipFlag = true;
+                    }
                 break;
 
                 default:
@@ -268,10 +302,12 @@ void Cpu::emulateCycle()
 
                 case 0x0055:
                     for (int i = 0; i <= V[X]; i++) memory[I + i] = V[i];
+                    I = I + X + 1;
                 break;
 
                 case 0x0065:
                     for (int i = 0; i <= V[X]; i++) V[i] = memory[I + i];
+                    I = I + X + 1;
                 break;
             
                 default:
@@ -287,26 +323,19 @@ void Cpu::emulateCycle()
         break;
     }
 
-    if (skipFlag)
-    {
-        pc += 4;
-    }
-    else if (!jumpFlag)
-    {
-        pc += 2;
-    }
+    if (!jumpFlag) pc += 2;
 
     timerCycle();
 }
 
 bool Cpu::loadGame(char* gameName)
 {
-    //cout << "Loading: " << gameName << "\n";
+    cout << "Loading: " << gameName << "\n";
     stringstream fileGame;
     if (!loadFile(gameName, fileGame)) return false;
 
     string fileData = fileGame.str();
-    //cout << "File size: " << fileData.length() << " bytes." << endl;
+    cout << "File size: " << fileData.length() << " bytes." << endl;
 
     if (0x1000 - 0x200 > fileData.length())
     {
@@ -317,11 +346,11 @@ bool Cpu::loadGame(char* gameName)
     }
     else
     {
-        //cout << "Error! ROM is bigger than available memory." << endl;
+        cout << "Error! ROM is bigger than available memory." << endl;
         return false;
     }
 
-    //cout << "Successfuly loaded!" << "\n";
+    cout << "Successfuly loaded!" << "\n";
     return true;
 }
 
@@ -374,25 +403,10 @@ void Cpu::timerCycle()
         }
     }
     
+    //cout << "Sound timer = " << dec << (int)sound_timer << endl;
     if (sound_timer > 0)
     {
-        if (audio.isTimerRunning())
-        {
-            if (audio.getTimerRemain() == 0)
-            {
-                sound_timer--;
-                audio.resetTimer();
-            }
-
-            if (sound_timer == 0)
-            {
-                audio.stopTimer();
-            }
-
-        }
-        else
-        {
-            audio.initTimer();
-        }
+        sound_timer--;
+        audio.play();
     }
 }

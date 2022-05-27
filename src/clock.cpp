@@ -2,7 +2,7 @@
 
 Clock::Clock()
 {
-
+    timerRunning = false;
 }
 
 Clock::~Clock()
