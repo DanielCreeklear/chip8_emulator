@@ -15,9 +15,9 @@ int main(int argc, char **argv)
 
 	Cpu *cpu = new Cpu();
 
-	//Emulator *emulator = new Emulator(640, 320, argv[1]);
-	char game[] = "./games/invaders.c8";
-	Emulator *emulator = new Emulator(640, 320, game, &title, cpu, &keysMap);
+	Emulator *emulator = new Emulator(640, 320, argv[1], &title, cpu, &keysMap);
+	//char game[] = "./games/invaders.c8";
+	//Emulator *emulator = new Emulator(640, 320, game, &title, cpu, &keysMap);
 
     return 0;
 }
