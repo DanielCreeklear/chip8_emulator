@@ -12,3 +12,4 @@ Debug
 
 # Zips from dependencies
 *.zip
+/Release
