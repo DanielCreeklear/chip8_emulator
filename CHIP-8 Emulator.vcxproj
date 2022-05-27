@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\audio.cpp" />
+    <ClCompile Include="src\Beeper.cpp" />
     <ClCompile Include="src\Gpu.cpp" />
     <ClCompile Include="src\Emulator.cpp" />
     <ClCompile Include="src\clock.cpp" />
@@ -35,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\audio.h" />
+    <ClInclude Include="src\Beeper.h" />
     <ClInclude Include="src\configs.h" />
     <ClInclude Include="src\Gpu.h" />
     <ClInclude Include="src\Emulator.h" />
@@ -96,8 +98,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath);$(SolutionDir)dependencies\freeglut\include</IncludePath>
-    <LibraryPath>$(LibraryPath);"$(SolutionDir)dependencies\freeglut\lib\$(Platform)"</LibraryPath>
+    <IncludePath>$(IncludePath);$(SolutionDir)dependencies\freeglut\include;$(SolutionDir)dependencies\sdl\include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(SolutionDir)dependencies\freeglut\lib\$(Platform);$(SolutionDir)dependencies\sdl\lib\$(Platform)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -121,14 +123,17 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\sdl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies);freeglut.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);freeglut.lib;SDL2.lib;SDL2main.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\sdl\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)dependencies\freeglut\bin\$(Platform)\freeglut.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)dependencies\freeglut\bin\$(Platform)\freeglut.dll" "$(OutDir)"
+copy "$(SolutionDir)dependencies\sdl\bin\$(Platform)\SDL2.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
