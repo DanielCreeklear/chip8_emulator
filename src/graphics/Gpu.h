@@ -3,7 +3,7 @@
 #include <gl/glut.h>
 #include <string>
 #include <iostream>
-#include "cpu.h"
+#include "../cpu/cpu.h"
 
 
 static std::unordered_map<char, int> *keysMapGraphics;

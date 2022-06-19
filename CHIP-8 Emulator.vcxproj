@@ -19,12 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\audio.cpp" />
-    <ClCompile Include="src\Beeper.cpp" />
-    <ClCompile Include="src\Gpu.cpp" />
-    <ClCompile Include="src\Emulator.cpp" />
-    <ClCompile Include="src\clock.cpp" />
-    <ClCompile Include="src\cpu.cpp" />
+    <ClCompile Include="src\audio\audio.cpp" />
+    <ClCompile Include="src\audio\Beeper.cpp" />
+    <ClCompile Include="src\graphics\Gpu.cpp" />
+    <ClCompile Include="src\emulator\Emulator.cpp" />
+    <ClCompile Include="src\cpu\clock.cpp" />
+    <ClCompile Include="src\cpu\cpu.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\utils.cpp" />
   </ItemGroup>
@@ -35,13 +35,13 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\audio.h" />
-    <ClInclude Include="src\Beeper.h" />
+    <ClInclude Include="src\audio\audio.h" />
+    <ClInclude Include="src\audio\Beeper.h" />
     <ClInclude Include="src\configs.h" />
-    <ClInclude Include="src\Gpu.h" />
-    <ClInclude Include="src\Emulator.h" />
-    <ClInclude Include="src\clock.h" />
-    <ClInclude Include="src\cpu.h" />
+    <ClInclude Include="src\graphics\Gpu.h" />
+    <ClInclude Include="src\emulator\Emulator.h" />
+    <ClInclude Include="src\cpu\clock.h" />
+    <ClInclude Include="src\cpu\cpu.h" />
     <ClInclude Include="src\utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

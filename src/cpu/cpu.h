@@ -4,9 +4,9 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-#include "utils.h"
+#include "../utils.h"
 #include "clock.h"
-#include "audio.h"
+#include "../audio/audio.h"
 
 using namespace std;
 

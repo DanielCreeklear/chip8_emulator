@@ -1,8 +1,8 @@
 #include <gl/glut.h>
 #include <iostream>
-#include "Emulator.h"
+#include "emulator/Emulator.h"
 #include "configs.h"
-#include "cpu.h"
+#include "cpu/cpu.h"
 
 
 int main(int argc, char **argv)

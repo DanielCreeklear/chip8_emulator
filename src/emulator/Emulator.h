@@ -2,8 +2,8 @@
 #include <unordered_map>
 #include <sstream>
 #include <gl/glut.h>
-#include "cpu.h"
-#include "Gpu.h"
+#include "../cpu/cpu.h"
+#include "../graphics/Gpu.h"
 
 static Cpu* cpu = NULL;
 static Gpu* gpu = NULL;
