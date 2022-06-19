@@ -1,35 +1,40 @@
 #pragma once
 #include <unordered_map>
-#include <iostream>
-#include <time.h>
 #include <gl/glut.h>
+#include <string>
+#include <iostream>
 #include "cpu.h"
 
-static std::uint8_t ***pixelBuffer;
-static clock_t startTimer;
-static int fps = 0;
-static Cpu *cpuGraphics;
+
 static std::unordered_map<char, int> *keysMapGraphics;
 
-const int pixelSize = 10;
+static int pixelSize = 10;
+static int screenBuffer[32][64];
 
-void buildScreenBuffer(int width, int height);
-void update_display();
-void idle();
-void keyDown(unsigned char key, int x, int y);
-void keyUp(unsigned char key, int x, int y);
+typedef struct
+{
+	int x;
+	int y;
+} Vertex;
 
-void setCpu(Cpu *cpu);
-
-void setKeysMapGraphics(std::unordered_map<char, int> *keysMapGraphics);
+typedef struct
+{
+	Vertex vertexA;
+	Vertex vertexB;
+	bool color;
+} Pixel;
 
 class Gpu
 {
 private:
-	
+	Cpu* cpu = NULL;
+
+	Pixel getPixel(int x, int y);
 public:
-	Gpu();
+	Gpu(Cpu* cpu);
 	void buildWindow(int width, int height, std::string title);
 	void init(int width, int height, std::string *title);
+	void refreshScreenBuffer();
+	void drawFrame(int windowHeight);
 };
 
