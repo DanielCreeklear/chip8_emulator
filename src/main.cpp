@@ -12,7 +12,6 @@ int main(int argc, char **argv)
 	if (SDL_Init(SDL_INIT_AUDIO))
 		return 1;
 	string gamePath;
-	Cpu *cpu = new Cpu();
 
 	if (argc <= 1)
 	{
@@ -24,7 +23,7 @@ int main(int argc, char **argv)
 		gamePath = argv[1];
 	}
 
-	Emulator *emulator = new Emulator(640, 320, &gamePath, &title, cpu);
+	Emulator *emulator = new Emulator(640, 320, &gamePath, &title);
 
     return 0;
 }
